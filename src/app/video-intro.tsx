@@ -22,7 +22,7 @@ export function VideoIntro() {
           Larry: Portrait of A Predator Part - U.S. Gymnastics Scandal
         </h1>
         <p className="text-gray-200 text-center mb-8 max-w-xl mx-auto">
-          The rise of Bela Karolyi and America's love affair with gymnastics.
+          The rise of Bela Karolyi and America&apos;s love affair with gymnastics.
         </p>
         <div
           className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl mx-auto"
