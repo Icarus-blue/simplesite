@@ -1,12 +1,7 @@
 import React from "react";
 import {
   Navbar as MTNavbar,
-  Collapse,
-  IconButton,
-  Typography,
-  Button,
 } from "@material-tailwind/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 interface NavItemProps {
   children: React.ReactNode;
@@ -15,15 +10,13 @@ interface NavItemProps {
 function NavItem({ children, href }: NavItemProps) {
   return (
     <li>
-      <Typography
-        as="a"
+      <a
         href={href || "#"}
         target={href ? "_blank" : "_self"}
-        variant="small"
-        className="font-medium"
+        className="font-medium transition-colors hover:text-blue-600"
       >
         {children}
-      </Typography>
+      </a>
     </li>
   );
 }
