@@ -36,7 +36,7 @@ export default function VideoIntro() {
   useEffect(() => {
     async function fetchLatestVideo() {
       try {
-        const res = await fetch("https://simplebackend-qxl1.onrender.com/api/videos");
+        const res = await fetch("https://simpleback-gwkn.onrender.com/api/videos");
         if (!res.ok) throw new Error(`Failed to fetch video: ${res.status}`);
         const latestVideo = await res.json();
         if (!latestVideo || !latestVideo.youtubeUrl) {

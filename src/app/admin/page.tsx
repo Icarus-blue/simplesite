@@ -11,7 +11,7 @@ export default function AdminPage() {
     e.preventDefault();
     setStatus("Uploading...");
     try {
-      const res = await fetch("https://simplebackend-qxl1.onrender.com/api/videos", {
+      const res = await fetch("https://simpleback-gwkn.onrender.com/api/videos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ youtubeUrl, title, description }),
