@@ -1,16 +1,68 @@
 "use client";
+import React, { useState, useEffect } from "react";
 
-import React from "react";
+// Utility to extract video ID from various YouTube URL formats
+function extractYouTubeId(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === "youtu.be") {
+      return parsed.pathname.slice(1);
+    }
+    if (parsed.searchParams.has("v")) {
+      return parsed.searchParams.get("v");
+    }
+    // Fallback for /embed/VIDEO_ID or /v/VIDEO_ID
+    const match = parsed.pathname.match(/\/(embed|v)\/([^/?]+)/);
+    if (match) return match[2];
+  } catch {
+    // Invalid URL
+  }
+  return null;
+}
 
-const YOUTUBE_ID = "tpuEgfIcmH0";
-const YOUTUBE_URL = `https://www.youtube.com/watch?v=${YOUTUBE_ID}`;
+interface VideoData {
+  youtubeUrl: string;
+  title: string;
+  description: string;
+  createdAt?: string;
+}
 
-export function VideoIntro() {
-  // Prevent click on video from propagating to the page
+export default function VideoIntro() {
+  const [video, setVideo] = useState<VideoData | null>(null);
+  const [youtubeId, setYoutubeId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchLatestVideo() {
+      try {
+        const res = await fetch("https://simplebackend-qxl1.onrender.com/api/videos");
+        if (!res.ok) throw new Error(`Failed to fetch video: ${res.status}`);
+        const latestVideo = await res.json();
+        if (!latestVideo || !latestVideo.youtubeUrl) {
+          setError("No video found.");
+          setLoading(false);
+          return;
+        }
+        setVideo(latestVideo);
+        setYoutubeId(extractYouTubeId(latestVideo.youtubeUrl));
+      } catch (err: any) {
+        setError(err.message || "Error fetching video.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchLatestVideo();
+  }, []);
+
   const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
+  const openYoutube = () => {
+    if (video?.youtubeUrl) window.open(video.youtubeUrl, "_blank");
+  };
 
-  // Open YouTube in new tab on page click
-  const openYoutube = () => window.open(YOUTUBE_URL, "_blank");
+  if (loading) return <div className="text-center py-20 text-white">Loading...</div>;
+  if (error) return <div className="text-center py-20 text-red-400">{error}</div>;
+  if (!video || !youtubeId) return <div className="text-center py-20 text-white">No video available.</div>;
 
   return (
     <div
@@ -19,10 +71,10 @@ export function VideoIntro() {
     >
       <div className="w-full max-w-3xl">
         <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-2 drop-shadow-lg">
-          Larry: Portrait of A Predator Part - U.S. Gymnastics Scandal
+          {video.title}
         </h1>
         <p className="text-gray-200 text-center mb-8 max-w-xl mx-auto">
-          The rise of Bela Karolyi and America&apos;s love affair with gymnastics.
+          {video.description}
         </p>
         <div
           className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl mx-auto"
@@ -30,8 +82,8 @@ export function VideoIntro() {
         >
           <iframe
             className="w-full h-full"
-            src={`https://www.youtube.com/embed/${YOUTUBE_ID}?autoplay=1&mute=1&rel=0&showinfo=0&controls=1`}
-            title="Larry: Portrait of A Predator Part - U.S. Gymnastics Scandal"
+            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&rel=0&showinfo=0&controls=1`}
+            title={video.title}
             allow="autoplay; encrypted-media"
             allowFullScreen
           />
@@ -40,5 +92,3 @@ export function VideoIntro() {
     </div>
   );
 }
-
-export default VideoIntro;
