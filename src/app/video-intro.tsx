@@ -5,15 +5,24 @@ import React, { useState, useEffect } from "react";
 function extractYouTubeId(url: string): string | null {
   try {
     const parsed = new URL(url);
+
+    // Handle youtu.be short URLs
     if (parsed.hostname === "youtu.be") {
       return parsed.pathname.slice(1);
     }
+
+    // Handle standard watch URLs: ?v=VIDEO_ID
     if (parsed.searchParams.has("v")) {
       return parsed.searchParams.get("v");
     }
-    // Fallback for /embed/VIDEO_ID or /v/VIDEO_ID
-    const match = parsed.pathname.match(/\/(embed|v)\/([^/?]+)/);
+
+    // Handle /embed/VIDEO_ID, /v/VIDEO_ID, /live/VIDEO_ID
+    const match = parsed.pathname.match(/\/(embed|v|live)\/([^/?]+)/);
     if (match) return match[2];
+
+    // Handle /shorts/VIDEO_ID
+    const shortsMatch = parsed.pathname.match(/\/shorts\/([^/?]+)/);
+    if (shortsMatch) return shortsMatch[1];
   } catch {
     // Invalid URL
   }
@@ -39,6 +48,7 @@ export default function VideoIntro() {
         const res = await fetch("https://simpleback-gwkn.onrender.com/api/videos");
         if (!res.ok) throw new Error(`Failed to fetch video: ${res.status}`);
         const latestVideo = await res.json();
+        console.log('==============>',latestVideo)
         if (!latestVideo || !latestVideo.youtubeUrl) {
           setError("No video found.");
           setLoading(false);
@@ -54,7 +64,7 @@ export default function VideoIntro() {
     }
     fetchLatestVideo();
   }, []);
-
+  console.log(youtubeId)
   const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
   const openYoutube = () => {
     if (video?.youtubeUrl) window.open(video.youtubeUrl, "_blank");
