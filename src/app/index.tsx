@@ -1,6 +1,7 @@
 
-// export * from "./page";
-// export * from "./video-intro";
+asdfasdf
+export * from "./page";
+export * from "./video-intro";
 
 
 
